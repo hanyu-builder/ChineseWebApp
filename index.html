@@ -3,119 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港急症室等候時間實時查詢</title>
-    <!-- 載入 Google Fonts -->
+    <title>香港急症室等候時間儀表板</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 基礎頁面設定 */
         body {
             margin: 0;
             padding: 0;
-            background-color: #f0f2f5;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
+            /* 背景色設為透明或與 Hero Section 相同，確保 iframe 融合 */
+            background-color: transparent; 
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-x: hidden; /* 防止 iframe 出現橫向捲軸 */
         }
 
-        /* --- Style B: Sky & Code 科技風格規範 (急症室查詢特化版) --- */
-        .ai-article-content {
-            --web-primary: #0EA5E9;   /* 天空藍 */
-            --web-secondary: #38BDF8; /* 亮藍 */
-            --web-dark: #0F172A;      /* 深海藍 */
-            --web-success: #22C55E;   /* 正常綠 */
-            --web-warning: #F59E0B;   /* 繁忙黃 */
-            --web-error: #EF4444;     /* 非常繁忙紅 */
-            --web-critical: #8B5CF6;  /* 極度繁忙紫 */
+        /* --- Style B: Sky & Code 科技風格 (App 獨立版) --- */
+        :root {
+            --web-primary: #0EA5E9;
+            --web-secondary: #38BDF8;
+            --web-dark: #0F172A;
+            --web-success: #22C55E;
+            --web-warning: #F59E0B;
+            --web-error: #EF4444;
+            --web-critical: #8B5CF6;
             --web-bg-light: #F0F9FF;
-            --white: #FFFFFF;
             --text-main: #1E293B;
             --text-muted: #64748B;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --shadow-tech: 0 20px 50px rgba(14, 165, 233, 0.15);
-            
-            font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
-            line-height: 1.8;
-            color: var(--text-main);
-            width: 100%;
-            max-width: 900px;
+        }
+
+        /* 儀表板外框 */
+        .dashboard-container {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* 英雄區塊 */
-        .ai-article-content .hero-section {
-            background: #0F172A;
+            background: var(--web-dark);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(14, 165, 233, 0.15);
             color: white;
-            padding: 60px 20px 160px 20px;
-            border-radius: var(--radius-lg);
             text-align: center;
-            margin-bottom: 50px;
-            position: relative;
-            overflow: visible; 
-            box-shadow: var(--shadow-tech);
         }
 
-        .ai-article-content .hero-title {
-            font-size: 2.5rem;
+        .hero-title {
+            font-size: 2rem;
             font-weight: 900;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             background: linear-gradient(to right, #7DD3FC, #FFFFFF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
         }
 
-        .ai-article-content .hero-p {
+        .hero-p {
             color: #BAE6FD;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
+            font-size: 1rem;
+            margin-bottom: 30px;
         }
 
-        /* 瀏覽器模擬視窗 */
-        .ai-article-content .browser-window {
-            width: 95%;
-            max-width: 750px;
+        /* 模擬瀏覽器視窗 */
+        .browser-window {
             background: white;
             border-radius: 12px;
-            margin: 40px auto -140px auto;
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            overflow: visible; 
-            border: 1px solid #E2E8F0;
+            overflow: hidden;
             text-align: left;
-            z-index: 100;
-            position: relative;
         }
 
-        .ai-article-content .browser-bar {
-            height: 35px;
+        .browser-bar {
+            height: 30px;
             background: #F1F5F9;
             display: flex;
             align-items: center;
             padding: 0 15px;
-            gap: 8px;
+            gap: 6px;
             border-bottom: 1px solid #E2E8F0;
-            border-radius: 12px 12px 0 0;
         }
 
-        .ai-article-content .dot { width: 10px; height: 10px; border-radius: 50%; }
-        .ai-article-content .dot.red { background: #EF4444; }
-        .ai-article-content .dot.yellow { background: #F59E0B; }
-        .ai-article-content .dot.green { background: #10B981; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.red { background: #EF4444; }
+        .dot.yellow { background: #F59E0B; }
+        .dot.green { background: #10B981; }
 
-        .ai-article-content .browser-content {
-            padding: 0;
-            background: white;
-            border-radius: 0 0 12px 12px;
-        }
-
-        /* 更新狀態列 */
-        .ai-article-content .update-banner {
+        /* 更新狀態條 */
+        .update-banner {
             background: #F8FAFC;
             padding: 10px 20px;
             border-bottom: 1px solid #E2E8F0;
@@ -126,321 +96,133 @@
             font-weight: 700;
             color: var(--text-muted);
         }
-        .ai-article-content #aed-last-update { color: var(--web-primary); }
+        #aed-last-update { color: var(--web-primary); }
 
-        /* 區域顯示 */
-        .ai-article-content .aed-scroll-area {
-            padding: 25px;
-            max-height: 500px;
+        /* 滾動區域 */
+        .aed-scroll-area {
+            padding: 20px;
+            max-height: 600px; /* 增加高度 */
             overflow-y: auto;
             background: #FFFFFF;
         }
 
-        .ai-article-content .region-title {
-            font-size: 1.2rem;
+        /* 區域標題 */
+        .region-title {
+            font-size: 1.1rem;
             font-weight: 900;
-            color: var(--web-dark);
-            margin: 20px 0 15px;
+            color: var(--text-main);
+            margin: 20px 0 10px;
             display: flex;
             align-items: center;
             gap: 8px;
+            border-bottom: 2px solid #E2E8F0;
+            padding-bottom: 5px;
         }
-        .ai-article-content .region-title::before { content: ''; width: 4px; height: 18px; background: var(--web-primary); border-radius: 4px; }
+        .region-title::before { content: ''; width: 4px; height: 18px; background: var(--web-primary); border-radius: 4px; }
 
-        /* 醫院卡片網格 */
-        .ai-article-content .aed-grid {
+        /* 醫院卡片 */
+        .aed-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
-        .ai-article-content .hosp-card {
+        .hosp-card {
             background: #F8FAFC;
             border: 1px solid #E2E8F0;
             border-left: 5px solid #CBD5E1;
             border-radius: 8px;
-            padding: 15px;
+            padding: 12px;
             transition: all 0.2s;
         }
-        .ai-article-content .hosp-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .hosp-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        .ai-article-content .hosp-name { font-weight: 800; font-size: 0.95rem; color: var(--web-dark); display: block; margin-bottom: 10px; }
-        .ai-article-content .wait-time { font-family: 'Roboto Mono', monospace; font-size: 1.4rem; font-weight: 700; text-align: right; display: block; }
+        .hosp-name { font-weight: 700; font-size: 0.9rem; color: var(--text-main); display: block; margin-bottom: 5px; }
+        .wait-time { font-family: 'Roboto Mono', monospace; font-size: 1.2rem; font-weight: 700; text-align: right; display: block; }
 
-        /* 狀態顏色定義 */
-        .ai-article-content .wait-short { border-left-color: var(--web-success); }
-        .ai-article-content .wait-short .wait-time { color: var(--web-success); }
-        .ai-article-content .wait-medium { border-left-color: var(--web-warning); }
-        .ai-article-content .wait-medium .wait-time { color: var(--web-warning); }
-        .ai-article-content .wait-long { border-left-color: var(--web-error); }
-        .ai-article-content .wait-long .wait-time { color: var(--web-error); }
-        .ai-article-content .wait-very-long { border-left-color: var(--web-critical); }
-        .ai-article-content .wait-very-long .wait-time { color: var(--web-critical); }
+        /* 狀態顏色 */
+        .wait-short { border-left-color: var(--web-success); }
+        .wait-short .wait-time { color: var(--web-success); }
+        .wait-medium { border-left-color: var(--web-warning); }
+        .wait-medium .wait-time { color: var(--web-warning); }
+        .wait-long { border-left-color: var(--web-error); }
+        .wait-long .wait-time { color: var(--web-error); }
+        .wait-very-long { border-left-color: var(--web-critical); }
+        .wait-very-long .wait-time { color: var(--web-critical); }
 
-        /* 內容主體區 */
-        .ai-article-content .content-body { margin-top: 180px; }
-
-        .ai-article-content h2 {
-            font-size: 1.8rem;
-            color: #0C4A6E;
-            border-left: 6px solid var(--web-primary);
-            padding-left: 20px;
-            margin: 80px 0 30px;
-            font-weight: 900;
-            background: transparent;
-        }
-
-        .ai-article-content .intro-box {
-            background: linear-gradient(135deg, #F0F9FF, #E0F2FE);
-            padding: 30px; border-radius: 16px; margin-bottom: 40px;
-            border: 1px solid #BAE6FD; color: #0369A1;
-        }
-
-        /* 流程卡片 */
-        .ai-article-content .process-container { display: flex; flex-direction: column; gap: 20px; margin: 40px 0; }
-        .ai-article-content .process-step {
-            display: flex; align-items: flex-start; gap: 25px; background: white;
-            padding: 25px; border-radius: 16px; border: 1px solid #E2E8F0;
-            transition: all 0.3s; position: relative; overflow: hidden;
-        }
-        .ai-article-content .process-step:hover { transform: translateX(10px); border-color: var(--web-primary); }
-        .ai-article-content .process-step::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--web-primary); }
-        
-        .ai-article-content .step-num { font-size: 3rem; font-weight: 900; color: #F1F5F9; line-height: 1; min-width: 60px; }
-        .ai-article-content .step-info h3 { margin: 0 0 10px; color: var(--web-dark); font-size: 1.3rem; border: none; padding: 0; font-weight: 800; }
-
-        /* 特點網格 (分流類別) */
-        .ai-article-content .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .ai-article-content .feature-card {
-            background: white; border: 1px solid #E2E8F0; border-radius: 12px;
-            padding: 25px; border-top: 5px solid var(--web-dark); transition: all 0.2s;
-        }
-        .ai-article-content .feature-card.highlight { border-top-color: var(--web-primary); }
-
-        /* FAQ */
-        .ai-article-content details { background: white; border: 1px solid #E2E8F0; border-radius: 10px; margin-bottom: 15px; padding: 0; overflow: hidden; cursor: pointer; }
-        .ai-article-content summary { padding: 20px; font-weight: 700; color: var(--web-dark); display: flex; justify-content: space-between; align-items: center; list-style: none; }
-        .ai-article-content summary::after { content: '→'; color: var(--web-primary); transition: transform 0.3s; font-size: 1.2rem; }
-        .ai-article-content details[open] summary::after { transform: rotate(90deg); }
-        .ai-article-content details p { padding: 0 20px 20px 20px; margin: 0; color: var(--text-muted); border-top: 1px solid #F1F5F9; padding-top: 15px; }
+        /* 載入/錯誤狀態 */
+        .status-msg { text-align: center; padding: 40px; color: var(--text-muted); }
+        .error-msg { color: var(--web-error); }
 
         @media (max-width: 600px) {
-            .ai-article-content .hero-title { font-size: 1.8rem; }
-            .ai-article-content .content-body { margin-top: 180px; }
-            .ai-article-content .aed-grid { grid-template-columns: 1fr; }
-            .ai-article-content .process-step { flex-direction: column; gap: 10px; }
+            .hero-title { font-size: 1.5rem; }
+            .aed-grid { grid-template-columns: 1fr; }
+            .update-banner { flex-direction: column; gap: 5px; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ai-article-content">
+<div class="dashboard-container">
+    <div class="hero-title">香港急症室等候時間</div>
+    <div class="hero-p">即時數據同步自醫院管理局</div>
 
-        <!-- 1. 英雄區塊 (包含查詢器) -->
-        <header class="hero-section">
-            <span class="hero-title">香港急症室等候時間實時查詢</span>
-            <p class="hero-p">即時獲取醫院管理局官方數據，掌握全港急症室繁忙狀況，幫助您在求診前做出最明智的選擇。</p>
+    <div class="browser-window">
+        <div class="browser-bar">
+            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        </div>
+        
+        <div class="update-banner">
+            <span>📡 資料來源：醫管局</span>
+            <span>更新於：<span id="aed-last-update">--:--</span></span>
+        </div>
 
-            <!-- 瀏覽器視窗模擬 -->
-            <div class="browser-window" id="aed-app">
-                <div class="browser-bar">
-                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
-                </div>
-                <div class="browser-content">
-                    
-                    <div class="update-banner">
-                        <span>📡 資料來源：<span id="source-label">醫管局 (自動切換)</span></span>
-                        <span>最後更新：<span id="aed-last-update">載入中...</span></span>
-                    </div>
-
-                    <div class="aed-scroll-area" id="aed-main-container">
-                        <div style="color: #94A3B8; text-align: center; padding: 40px;">
-                            正在讀取最新數據...
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </header>
-
-        <div class="content-body">
-            <!-- 2. 引言 -->
-            <div class="intro-box">
-                <p><strong>求診前的關鍵資訊。</strong><br>在急需醫療服務時，了解各區醫院的繁忙程度能有效縮短等待時間。本工具串接醫管局 Open Data，每 15 分鐘自動更新，為市民提供透明且直觀的等候時間參考。但請注意：緊急個案將獲得優先處理，無需等候。</p>
-            </div>
-
-            <!-- 3. 使用方法 (大型數字流程) -->
-            <h2>如何解讀此頁面的資訊？</h2>
-            <div class="process-container">
-                <div class="process-step">
-                    <span class="step-num">01</span>
-                    <div class="step-info">
-                        <h3>分區查找醫院</h3>
-                        <p>儀表板已根據「香港島」、「九龍」、「新界」三大地理區域進行分類，方便您快速定位鄰近的醫療機構。</p>
-                    </div>
-                </div>
-                <div class="process-step">
-                    <span class="step-num">02</span>
-                    <div class="step-info">
-                        <h3>顏色直覺判斷</h3>
-                        <p><strong>綠色</strong> 代表等候約 1 小時；<strong>黃色</strong> 需等 2-3 小時；<strong>紅色</strong> 及 <strong>紫色</strong> 則代表需求極大（需等超過 4-6 小時）。</p>
-                    </div>
-                </div>
-                <div class="process-step">
-                    <span class="step-num">03</span>
-                    <div class="step-info">
-                        <h3>理解顯示時間</h3>
-                        <p>系統顯示的「約 X 小時」是指針對被分流為「<strong>次緊急</strong>」及「<strong>非緊急</strong>」病人的預計時間，反映現場繁忙程度。</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. 分流制度詳解 (特點網格) -->
-            <h2>重要須知：急症室分流制度</h2>
-            <p>香港急症室實行嚴格的分流機制，由專業醫護人員即時評估病情：</p>
-            <div class="feature-grid">
-                <div class="feature-card highlight">
-                    <strong>🚨 危殆、危急與緊急</strong>
-                    <p style="font-size:0.9rem; margin-top:10px;">包含心臟病發、中風、嚴重創傷或窒息。這類病人會<strong>立即獲得處理</strong>，不受顯示的等候時間限制。</p>
-                </div>
-                <div class="feature-card">
-                    <strong>🩹 次緊急與非緊急</strong>
-                    <p style="font-size:0.9rem; margin-top:10px;">包含傷風感冒、輕微扭傷或皮外傷。這類個案需按序等候，繁忙時段等待時間可能較長。</p>
-                </div>
-            </div>
-
-            <!-- 5. 建議 -->
-            <h2>我應該使用急症室嗎？</h2>
-            <div class="intro-box" style="background:white; border-color:#E2E8F0;">
-                <ul style="padding-left:20px; color:var(--text-main);">
-                    <li><strong>適用對象</strong>：處理緊急且危及生命的傷病（高燒不退、呼吸困難、嚴重過敏等）。</li>
-                    <li><strong>非緊急選擇</strong>：輕微病症建議優先考慮使用 **普通科門診 (GOPC)**、私家醫生或 **24 小時私家診所**，以保障急症資源能優先救治重症者。</li>
-                </ul>
-            </div>
-
-            <!-- 6. FAQ (完整保留) -->
-            <h2>常見問題 (FAQ)</h2>
-            <details>
-                <summary>Q1: 為什麼等候時間跟現場顯示的不太一樣？</summary>
-                <p>醫管局網頁數據每 15 分鐘更新一次。由於急症室隨時可能有重大意外傷者被送入，現場情況可能在短時間內劇烈變化。數據僅供大趨勢參考。</p>
-            </details>
-            <details>
-                <summary>Q2: 到急症室求診需要帶什麼？</summary>
-                <p>請備妥有效身分證件、正在服用的藥物清單（如有）以及過敏史資料。非符合資格人士（如非港人）需支付較高的診金。</p>
-            </details>
-            <details>
-                <summary>Q3: 如果我等了很久，可以中途離開改看私家醫生嗎？</summary>
-                <p>可以。但請注意：一旦登記並經過護士分流，即便中途離開，已繳付的登記費用通常不予退還。</p>
-            </details>
-
-            <p style="font-size: 0.85rem; color: #94A3B8; margin-top: 60px; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 30px;">
-                <strong>免責聲明</strong>：所有數據源自醫管局公開平台。數據僅供參考，不應用作診斷依據。遇有緊急危險請立即撥打 999 尋求救護車協助。
-            </p>
+        <div class="aed-scroll-area" id="aed-main-container">
+            <div class="status-msg">正在讀取 GitHub 數據...</div>
         </div>
     </div>
+</div>
 
-    <script>
-    (function() {
-        const app = document.getElementById('aed-app');
-        if (!app) return;
+<script>
+(function() {
+    const mainContainer = document.getElementById('aed-main-container');
+    const lastUpdateSpan = document.getElementById('aed-last-update');
+    
+    // 直接讀取 GitHub Actions 生成的本地檔案
+    // 加入時間戳參數 (Cache Busting) 確保讀取最新版
+    const DATA_URL = './aed_data.json';
 
-        const mainContainer = app.querySelector('#aed-main-container');
-        const lastUpdateSpan = app.querySelector('#aed-last-update');
-        const sourceLabel = app.querySelector('#source-label');
-        
-        // 1. 本地路徑 (GitHub Actions 生成)
-        const LOCAL_DATA_URL = './aed_data.json';
-        // 2. 備用 Proxy URL
-        const HA_API = 'https://www.ha.org.hk/opendata/aed/aedwtdata2-tc.json';
-        const PROXY_URL = `https://api.allorigins.win/get?url=${encodeURIComponent(HA_API)}`;
+    const hospitalRegions = {
+        "東區尤德夫人那打素醫院": "香港島", "瑪麗醫院": "香港島", "律敦治醫院": "香港島",
+        "明愛醫院": "九龍", "廣華醫院": "九龍", "伊利沙伯醫院": "九龍", "基督教聯合醫院": "九龍",
+        "雅麗氏何妙齡那打素醫院": "新界", "北區醫院": "新界", "北大嶼山醫院": "新界", "博愛醫院": "新界",
+        "威爾斯親王醫院": "新界", "瑪嘉烈醫院": "新界", "長洲醫院": "新界", "天水圍醫院": "新界",
+        "將軍澳醫院": "新界", "屯門醫院": "新界", "仁濟醫院": "新界"
+    };
 
-        const hospitalRegions = {
-            "東區尤德夫人那打素醫院": "香港島", "瑪麗醫院": "香港島", "律敦治醫院": "香港島",
-            "明愛醫院": "九龍", "廣華醫院": "九龍", "伊利沙伯醫院": "九龍", "基督教聯合醫院": "九龍",
-            "雅麗氏何妙齡那打素醫院": "新界", "北區醫院": "新界", "北大嶼山醫院": "新界", "博愛醫院": "新界",
-            "威爾斯親王醫院": "新界", "瑪嘉烈醫院": "新界", "長洲醫院": "新界", "天水圍醫院": "新界",
-            "將軍澳醫院": "新界", "屯門醫院": "新界", "仁濟醫院": "新界"
-        };
+    function getTimeClass(waitText) {
+        if (waitText.includes("1")) return 'wait-short';
+        if (waitText.includes("2") || waitText.includes("3")) return 'wait-medium';
+        if (waitText.includes("4") || waitText.includes("5") || waitText.includes("6")) return 'wait-long';
+        return 'wait-very-long';
+    }
 
-        // 模擬數據 (最後的防線)
-        const MOCK_DATA = {
-            "updateTime": "系統維護中 (顯示示範數據)",
-            "waitTime": [
-                { "hospName": "瑪麗醫院", "topWait": "超過 3 小時", "districtTC": "香港島" },
-                { "hospName": "東區尤德夫人那打素醫院", "topWait": "超過 2 小時", "districtTC": "香港島" },
-                { "hospName": "律敦治醫院", "topWait": "超過 1 小時", "districtTC": "香港島" },
-                { "hospName": "伊利沙伯醫院", "topWait": "超過 5 小時", "districtTC": "九龍" },
-                { "hospName": "廣華醫院", "topWait": "超過 4 小時", "districtTC": "九龍" },
-                { "hospName": "基督教聯合醫院", "topWait": "超過 3 小時", "districtTC": "九龍" },
-                { "hospName": "明愛醫院", "topWait": "超過 2 小時", "districtTC": "九龍" },
-                { "hospName": "威爾斯親王醫院", "topWait": "超過 4 小時", "districtTC": "新界" },
-                { "hospName": "屯門醫院", "topWait": "超過 3 小時", "districtTC": "新界" },
-                { "hospName": "博愛醫院", "topWait": "超過 2 小時", "districtTC": "新界" },
-                { "hospName": "北區醫院", "topWait": "超過 2 小時", "districtTC": "新界" }
-            ]
-        };
-
-        function getTimeClass(waitText) {
-            if (waitText.includes("1")) return 'wait-short';
-            if (waitText.includes("2") || waitText.includes("3")) return 'wait-medium';
-            if (waitText.includes("4") || waitText.includes("5") || waitText.includes("6")) return 'wait-long';
-            return 'wait-very-long';
-        }
-
-        async function fetchWithFallback() {
-            let data = null;
-            let source = '';
-
-            // 嘗試 1: 本地 GitHub 檔案
-            try {
-                const noCacheUrl = `${LOCAL_DATA_URL}?t=${new Date().getTime()}`;
-                const res = await fetch(noCacheUrl);
-                if (res.ok) {
-                    data = await res.json();
-                    source = 'GitHub (本地快取)';
-                    console.log('Using local data');
-                } else {
-                    throw new Error('Local file not found');
-                }
-            } catch (localError) {
-                console.warn('Local fetch failed, trying proxy...');
-                // 嘗試 2: Proxy
-                try {
-                    const res = await fetch(PROXY_URL);
-                    if (res.ok) {
-                        const raw = await res.json();
-                        data = JSON.parse(raw.contents);
-                        source = '醫管局 (Proxy)';
-                        console.log('Using proxy data');
-                    } else {
-                        throw new Error('Proxy failed');
-                    }
-                } catch (proxyError) {
-                    console.warn('Proxy failed, using mock data...');
-                    // 嘗試 3: 模擬數據
-                    data = MOCK_DATA;
-                    source = '模擬數據 (連線失敗)';
-                }
-            }
-            return { data, source };
-        }
-
-        async function fetchAEDData() {
-            try {
-                const result = await fetchWithFallback();
-                const data = result.data;
-                
-                lastUpdateSpan.textContent = data.updateTime || '未知';
-                if(sourceLabel) sourceLabel.textContent = result.source;
-                
-                const regions = { '香港島': [], '九龍': [], '新界': [] };
-                
+    async function fetchAEDData() {
+        try {
+            const noCacheUrl = `${DATA_URL}?t=${new Date().getTime()}`;
+            const res = await fetch(noCacheUrl);
+            
+            if (!res.ok) throw new Error('Data file not found');
+            
+            const data = await res.json();
+            
+            lastUpdateSpan.textContent = data.updateTime || '未知';
+            
+            const regions = { '香港島': [], '九龍': [], '新界': [] };
+            
+            // 數據分組
+            if (data.waitTime && Array.isArray(data.waitTime)) {
                 data.waitTime.forEach(h => {
                     const reg = hospitalRegions[h.hospName];
                     if (reg) regions[reg].push(h);
@@ -464,24 +246,29 @@
                         html += `</div>`;
                     }
                 });
-
                 mainContainer.innerHTML = html;
-
-            } catch (e) {
-                console.error(e);
-                mainContainer.innerHTML = `
-                    <div style="text-align:center; padding:40px; color: #F43F5E;">
-                        <p>⚠️ 系統發生錯誤</p>
-                    </div>
-                `;
+            } else {
+                throw new Error('Data format error');
             }
+
+        } catch (e) {
+            console.error(e);
+            mainContainer.innerHTML = `
+                <div class="status-msg error-msg">
+                    <p>⚠️ 暫時無法讀取數據</p>
+                    <p style="font-size:0.8rem; margin-top:10px; color:#64748B;">
+                        請稍後再試。GitHub Actions 更新可能延遲。
+                    </p>
+                </div>
+            `;
         }
+    }
 
-        fetchAEDData();
-        // 用戶端每 60 秒檢查一次
-        setInterval(fetchAEDData, 60000);
+    fetchAEDData();
+    // 雖然頁面不會常開，但每 60 秒檢查一次新數據
+    setInterval(fetchAEDData, 60000);
 
-    })();
-    </script>
+})();
+</script>
 </body>
 </html>
