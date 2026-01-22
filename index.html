@@ -354,10 +354,9 @@
         const lastUpdateSpan = app.querySelector('#aed-last-update');
         const sourceLabel = app.querySelector('#source-label');
         
-        // 核心修改：優先使用本地 GitHub JSON，失敗則使用 Proxy
         // 1. 本地路徑 (GitHub Actions 生成)
         const LOCAL_DATA_URL = './aed_data.json';
-        // 2. 備用 Proxy (用於預覽環境或本地檔案失效時)
+        // 2. 備用 Proxy URL
         const HA_API = 'https://www.ha.org.hk/opendata/aed/aedwtdata2-tc.json';
         const PROXY_URL = `https://api.allorigins.win/get?url=${encodeURIComponent(HA_API)}`;
 
@@ -367,6 +366,24 @@
             "雅麗氏何妙齡那打素醫院": "新界", "北區醫院": "新界", "北大嶼山醫院": "新界", "博愛醫院": "新界",
             "威爾斯親王醫院": "新界", "瑪嘉烈醫院": "新界", "長洲醫院": "新界", "天水圍醫院": "新界",
             "將軍澳醫院": "新界", "屯門醫院": "新界", "仁濟醫院": "新界"
+        };
+
+        // 模擬數據 (最後的防線)
+        const MOCK_DATA = {
+            "updateTime": "系統維護中 (顯示示範數據)",
+            "waitTime": [
+                { "hospName": "瑪麗醫院", "topWait": "超過 3 小時", "districtTC": "香港島" },
+                { "hospName": "東區尤德夫人那打素醫院", "topWait": "超過 2 小時", "districtTC": "香港島" },
+                { "hospName": "律敦治醫院", "topWait": "超過 1 小時", "districtTC": "香港島" },
+                { "hospName": "伊利沙伯醫院", "topWait": "超過 5 小時", "districtTC": "九龍" },
+                { "hospName": "廣華醫院", "topWait": "超過 4 小時", "districtTC": "九龍" },
+                { "hospName": "基督教聯合醫院", "topWait": "超過 3 小時", "districtTC": "九龍" },
+                { "hospName": "明愛醫院", "topWait": "超過 2 小時", "districtTC": "九龍" },
+                { "hospName": "威爾斯親王醫院", "topWait": "超過 4 小時", "districtTC": "新界" },
+                { "hospName": "屯門醫院", "topWait": "超過 3 小時", "districtTC": "新界" },
+                { "hospName": "博愛醫院", "topWait": "超過 2 小時", "districtTC": "新界" },
+                { "hospName": "北區醫院", "topWait": "超過 2 小時", "districtTC": "新界" }
+            ]
         };
 
         function getTimeClass(waitText) {
@@ -380,7 +397,7 @@
             let data = null;
             let source = '';
 
-            // 嘗試 1: 讀取本地 GitHub 檔案
+            // 嘗試 1: 本地 GitHub 檔案
             try {
                 const noCacheUrl = `${LOCAL_DATA_URL}?t=${new Date().getTime()}`;
                 const res = await fetch(noCacheUrl);
@@ -392,8 +409,8 @@
                     throw new Error('Local file not found');
                 }
             } catch (localError) {
-                console.warn('Local fetch failed, trying proxy...', localError);
-                // 嘗試 2: 使用 Proxy 讀取醫管局 API
+                console.warn('Local fetch failed, trying proxy...');
+                // 嘗試 2: Proxy
                 try {
                     const res = await fetch(PROXY_URL);
                     if (res.ok) {
@@ -405,7 +422,10 @@
                         throw new Error('Proxy failed');
                     }
                 } catch (proxyError) {
-                    throw new Error('All data sources failed');
+                    console.warn('Proxy failed, using mock data...');
+                    // 嘗試 3: 模擬數據
+                    data = MOCK_DATA;
+                    source = '模擬數據 (連線失敗)';
                 }
             }
             return { data, source };
@@ -451,10 +471,7 @@
                 console.error(e);
                 mainContainer.innerHTML = `
                     <div style="text-align:center; padding:40px; color: #F43F5E;">
-                        <p>⚠️ 暫時無法讀取數據</p>
-                        <p style="font-size:0.8rem; color:#64748B; margin-top:10px;">
-                           請稍後再試。若您是開發者，請檢查 GitHub Actions 是否已生成 aed_data.json。
-                        </p>
+                        <p>⚠️ 系統發生錯誤</p>
                     </div>
                 `;
             }
