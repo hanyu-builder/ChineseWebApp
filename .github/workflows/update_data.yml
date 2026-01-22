@@ -2,9 +2,9 @@ name: Update AED Wait Time Data
 
 on:
   schedule:
-    # 每 15 分鐘執行一次 (GitHub Actions 的 cron 時間是 UTC)
+    # 每 15 分鐘執行一次
     - cron: '*/15 * * * *'
-  # 允許手動觸發 (方便測試)
+  # 允許手動點擊 "Run workflow" 按鈕觸發 (方便測試)
   workflow_dispatch:
 
 permissions:
@@ -27,9 +27,9 @@ jobs:
         run: |
           # 設定 Git 使用者 (GitHub Actions Bot)
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # 檢查檔案是否有變動
+          # 檢查檔案是否有變動 (包含新檔案或修改過的檔案)
           if [[ -n $(git status -s aed_data.json) ]]; then
             echo "Data has changed. Committing..."
             git add aed_data.json
