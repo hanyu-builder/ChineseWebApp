@@ -255,7 +255,7 @@
                 <div class="browser-content">
                     
                     <div class="update-banner">
-                        <span>📡 資料來源：醫管局 (Hospital Authority)</span>
+                        <span>📡 資料來源：<span id="source-label">醫管局 (自動切換)</span></span>
                         <span>最後更新：<span id="aed-last-update">載入中...</span></span>
                     </div>
 
@@ -352,9 +352,14 @@
 
         const mainContainer = app.querySelector('#aed-main-container');
         const lastUpdateSpan = app.querySelector('#aed-last-update');
+        const sourceLabel = app.querySelector('#source-label');
         
-        // 核心修改：加入時間戳以強制刷新快取
-        const DATA_URL = 'aed_data.json';
+        // 核心修改：優先使用本地 GitHub JSON，失敗則使用 Proxy
+        // 1. 本地路徑 (GitHub Actions 生成)
+        const LOCAL_DATA_URL = './aed_data.json';
+        // 2. 備用 Proxy (用於預覽環境或本地檔案失效時)
+        const HA_API = 'https://www.ha.org.hk/opendata/aed/aedwtdata2-tc.json';
+        const PROXY_URL = `https://api.allorigins.win/get?url=${encodeURIComponent(HA_API)}`;
 
         const hospitalRegions = {
             "東區尤德夫人那打素醫院": "香港島", "瑪麗醫院": "香港島", "律敦治醫院": "香港島",
@@ -371,17 +376,48 @@
             return 'wait-very-long';
         }
 
+        async function fetchWithFallback() {
+            let data = null;
+            let source = '';
+
+            // 嘗試 1: 讀取本地 GitHub 檔案
+            try {
+                const noCacheUrl = `${LOCAL_DATA_URL}?t=${new Date().getTime()}`;
+                const res = await fetch(noCacheUrl);
+                if (res.ok) {
+                    data = await res.json();
+                    source = 'GitHub (本地快取)';
+                    console.log('Using local data');
+                } else {
+                    throw new Error('Local file not found');
+                }
+            } catch (localError) {
+                console.warn('Local fetch failed, trying proxy...', localError);
+                // 嘗試 2: 使用 Proxy 讀取醫管局 API
+                try {
+                    const res = await fetch(PROXY_URL);
+                    if (res.ok) {
+                        const raw = await res.json();
+                        data = JSON.parse(raw.contents);
+                        source = '醫管局 (Proxy)';
+                        console.log('Using proxy data');
+                    } else {
+                        throw new Error('Proxy failed');
+                    }
+                } catch (proxyError) {
+                    throw new Error('All data sources failed');
+                }
+            }
+            return { data, source };
+        }
+
         async function fetchAEDData() {
             try {
-                // 加入時間戳參數，強制瀏覽器不使用快取
-                const noCacheUrl = `${DATA_URL}?t=${new Date().getTime()}`;
-                
-                const res = await fetch(noCacheUrl);
-                if (!res.ok) throw new Error('Data file not found or load failed');
-                
-                const data = await res.json();
+                const result = await fetchWithFallback();
+                const data = result.data;
                 
                 lastUpdateSpan.textContent = data.updateTime || '未知';
+                if(sourceLabel) sourceLabel.textContent = result.source;
                 
                 const regions = { '香港島': [], '九龍': [], '新界': [] };
                 
@@ -416,14 +452,16 @@
                 mainContainer.innerHTML = `
                     <div style="text-align:center; padding:40px; color: #F43F5E;">
                         <p>⚠️ 暫時無法讀取數據</p>
-                        <p style="font-size:0.8rem; color:#64748B; margin-top:10px;">請稍後再試，或檢查網路連線。</p>
+                        <p style="font-size:0.8rem; color:#64748B; margin-top:10px;">
+                           請稍後再試。若您是開發者，請檢查 GitHub Actions 是否已生成 aed_data.json。
+                        </p>
                     </div>
                 `;
             }
         }
 
         fetchAEDData();
-        // 用戶端每 60 秒檢查一次是否有新文件
+        // 用戶端每 60 秒檢查一次
         setInterval(fetchAEDData, 60000);
 
     })();
