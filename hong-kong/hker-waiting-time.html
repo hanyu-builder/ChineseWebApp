@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 基礎頁面設定 (僅用於 GitHub 獨立頁面顯示，不影響 App 內部樣式) */
+        /* 基礎頁面設定 */
         body {
             margin: 0;
             padding: 0;
@@ -39,13 +39,13 @@
             line-height: 1.8;
             color: var(--text-main);
             width: 100%;
-            max-width: 900px; /* 限制最大寬度 */
+            max-width: 900px;
             margin: 0 auto;
-            padding: 40px 20px; /* 增加上下邊距 */
+            padding: 40px 20px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 英雄區塊 (Hero Section) */
+        /* 英雄區塊 */
         .ai-article-content .hero-section {
             background: #0F172A;
             color: white;
@@ -75,7 +75,7 @@
             margin: 0 auto;
         }
 
-        /* 瀏覽器模擬視窗 (工具主體) */
+        /* 瀏覽器模擬視窗 */
         .ai-article-content .browser-window {
             width: 95%;
             max-width: 750px;
@@ -255,13 +255,13 @@
                 <div class="browser-content">
                     
                     <div class="update-banner">
-                        <span>📡 資料來源：醫管局 (Hospital Authority)</span>
-                        <span>最後更新：<span id="aed-last-update">載入中...</span></span>
+                        <span>📡 資料來源：醫管局 (更新時間)</span>
+                        <span id="aed-last-update">載入中...</span>
                     </div>
 
                     <div class="aed-scroll-area" id="aed-main-container">
                         <div style="color: #94A3B8; text-align: center; padding: 40px;">
-                            正在獲取最新數據，請稍候...
+                            正在讀取最新數據...
                         </div>
                     </div>
 
@@ -272,10 +272,10 @@
         <div class="content-body">
             <!-- 2. 引言 -->
             <div class="intro-box">
-                <p><strong>求診前的關鍵資訊。</strong><br>在急需醫療服務時，了解各區醫院的繁忙程度能有效縮短等待時間。本工具串接醫管局 Open Data，每 15 分鐘自動更新，為市民提供透明且直觀的等候時間參考。但請注意：緊急個案將獲得優先處理，無需等候。</p>
+                <p><strong>求診前的關鍵資訊。</strong><br>在急需醫療服務時，了解各區醫院的繁忙程度能有效縮短等待時間。本工具數據由 GitHub Action 自動抓取自醫管局，確保數據穩定且不受瀏覽器限制。但請注意：緊急個案將獲得優先處理，無需等候。</p>
             </div>
 
-            <!-- 3. 使用方法 (大型數字流程) -->
+            <!-- 3. 使用方法 -->
             <h2>如何解讀此頁面的資訊？</h2>
             <div class="process-container">
                 <div class="process-step">
@@ -292,18 +292,10 @@
                         <p><strong>綠色</strong> 代表等候約 1 小時；<strong>黃色</strong> 需等 2-3 小時；<strong>紅色</strong> 及 <strong>紫色</strong> 則代表需求極大（需等超過 4-6 小時）。</p>
                     </div>
                 </div>
-                <div class="process-step">
-                    <span class="step-num">03</span>
-                    <div class="step-info">
-                        <h3>理解顯示時間</h3>
-                        <p>系統顯示的「約 X 小時」是指針對被分流為「<strong>次緊急</strong>」及「<strong>非緊急</strong>」病人的預計時間，反映現場繁忙程度。</p>
-                    </div>
-                </div>
             </div>
 
-            <!-- 4. 分流制度詳解 (特點網格) -->
+            <!-- 4. 分流制度詳解 -->
             <h2>重要須知：急症室分流制度</h2>
-            <p>香港急症室實行嚴格的分流機制，由專業醫護人員即時評估病情：</p>
             <div class="feature-grid">
                 <div class="feature-card highlight">
                     <strong>🚨 危殆、危急與緊急</strong>
@@ -315,16 +307,7 @@
                 </div>
             </div>
 
-            <!-- 5. 建議 -->
-            <h2>我應該使用急症室嗎？</h2>
-            <div class="intro-box" style="background:white; border-color:#E2E8F0;">
-                <ul style="padding-left:20px; color:var(--text-main);">
-                    <li><strong>適用對象</strong>：處理緊急且危及生命的傷病（高燒不退、呼吸困難、嚴重過敏等）。</li>
-                    <li><strong>非緊急選擇</strong>：輕微病症建議優先考慮使用 **普通科門診 (GOPC)**、私家醫生或 **24 小時私家診所**，以保障急症資源能優先救治重症者。</li>
-                </ul>
-            </div>
-
-            <!-- 6. FAQ (完整保留) -->
+            <!-- 5. FAQ -->
             <h2>常見問題 (FAQ)</h2>
             <details>
                 <summary>Q1: 為什麼等候時間跟現場顯示的不太一樣？</summary>
@@ -334,13 +317,9 @@
                 <summary>Q2: 到急症室求診需要帶什麼？</summary>
                 <p>請備妥有效身分證件、正在服用的藥物清單（如有）以及過敏史資料。非符合資格人士（如非港人）需支付較高的診金。</p>
             </details>
-            <details>
-                <summary>Q3: 如果我等了很久，可以中途離開改看私家醫生嗎？</summary>
-                <p>可以。但請注意：一旦登記並經過護士分流，即便中途離開，已繳付的登記費用通常不予退還。</p>
-            </details>
 
             <p style="font-size: 0.85rem; color: #94A3B8; margin-top: 60px; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 30px;">
-                <strong>免責聲明</strong>：所有數據源自醫管局公開平台。數據僅供參考，不應用作診斷依據。遇有緊急危險請立即撥打 999 尋求救護車協助。
+                <strong>免責聲明</strong>：所有數據源自醫管局。數據僅供參考，不應用作診斷依據。遇有緊急危險請立即撥打 999 尋求救護車協助。
             </p>
         </div>
     </div>
@@ -353,29 +332,11 @@
         const mainContainer = app.querySelector('#aed-main-container');
         const lastUpdateSpan = app.querySelector('#aed-last-update');
         
-        // 醫管局官方數據源
-        const SOURCE_URL = 'https://www.ha.org.hk/opendata/aed/aedwtdata2-tc.json';
+        // --- 核心修改：讀取 GitHub 上的本地 JSON 檔案 ---
+        // 我們假設 Actions 抓取下來的檔案叫做 "aed_data.json"
+        // 添加時間戳以避免瀏覽器快取 (Cache Busting)
+        const DATA_URL = './aed_data.json?t=' + new Date().getTime();
 
-        // 定義多個代理服務 (優先順序排列)
-        const PROXY_LIST = [
-            {
-                // 方案 A: corsproxy.io (通常較快，直接回傳 JSON)
-                url: `https://corsproxy.io/?${encodeURIComponent(SOURCE_URL)}`,
-                type: 'direct'
-            },
-            {
-                // 方案 B: AllOrigins (備用，回傳 JSON 包裹的字串)
-                url: `https://api.allorigins.win/get?url=${encodeURIComponent(SOURCE_URL)}`,
-                type: 'wrapped'
-            },
-            {
-                // 方案 C: ThingProxy (備用2)
-                url: `https://thingproxy.freeboard.io/fetch/${SOURCE_URL}`,
-                type: 'direct'
-            }
-        ];
-
-        // 預設區域對照
         const hospitalRegions = {
             "東區尤德夫人那打素醫院": "香港島", "瑪麗醫院": "香港島", "律敦治醫院": "香港島",
             "明愛醫院": "九龍", "廣華醫院": "九龍", "伊利沙伯醫院": "九龍", "基督教聯合醫院": "九龍",
@@ -391,43 +352,13 @@
             return 'wait-very-long';
         }
 
-        // 嘗試獲取數據的函數 (包含重試邏輯)
-        async function fetchWithFallback() {
-            for (const proxy of PROXY_LIST) {
-                try {
-                    const res = await fetch(proxy.url);
-                    if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
-                    
-                    let data;
-                    if (proxy.type === 'wrapped') {
-                        // 處理 AllOrigins 這種包裹了一層的數據
-                        const raw = await res.json();
-                        if (!raw.contents) throw new Error('No content');
-                        data = JSON.parse(raw.contents);
-                    } else {
-                        // 處理直接回傳 JSON 的代理
-                        data = await res.json();
-                    }
-
-                    // 驗證數據結構是否正確
-                    if (!data.waitTime || !Array.isArray(data.waitTime)) {
-                        throw new Error('Invalid data format');
-                    }
-
-                    return data; // 成功獲取，返回數據
-                } catch (e) {
-                    console.warn(`Proxy ${proxy.url} failed, trying next...`, e);
-                    // 繼續迴圈嘗試下一個代理
-                }
-            }
-            throw new Error('All proxies failed');
-        }
-
         async function fetchAEDData() {
             try {
-                // 使用備援機制獲取數據
-                const data = await fetchWithFallback();
-
+                const res = await fetch(DATA_URL);
+                if (!res.ok) throw new Error('Data file not found (404)');
+                
+                const data = await res.json();
+                
                 lastUpdateSpan.textContent = data.updateTime || '未知';
                 
                 const regions = { '香港島': [], '九龍': [], '新界': [] };
@@ -459,19 +390,19 @@
                 mainContainer.innerHTML = html;
 
             } catch (e) {
+                console.error(e);
                 mainContainer.innerHTML = `
                     <div style="text-align:center; padding:40px; color: #F43F5E;">
-                        <p>❌ 數據獲取失敗，請檢查網路連線或稍後再試。</p>
-                        <p style="font-size:0.8rem; color:#64748B; margin-top:10px;">(所有數據源暫時無法連接)</p>
+                        <p>⚠️ 暫時無法讀取數據</p>
+                        <p style="font-size:0.8rem; color:#64748B; margin-top:10px;">請稍後再試，系統可能正在更新資料。</p>
                     </div>
                 `;
-                lastUpdateSpan.textContent = '連線錯誤';
             }
         }
 
-        // 初始化與定時更新 (15分鐘)
         fetchAEDData();
-        setInterval(fetchAEDData, 900000);
+        // 每 60 秒檢查一次本地檔案是否有更新（用戶端不需要太頻繁，主要依賴 GitHub Action 的更新頻率）
+        setInterval(fetchAEDData, 60000);
 
     })();
     </script>
