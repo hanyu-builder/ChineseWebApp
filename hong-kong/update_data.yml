@@ -1,0 +1,40 @@
+name: Update AED Wait Time Data
+
+on:
+  schedule:
+    # 每 15 分鐘執行一次 (GitHub Actions 的 cron 時間是 UTC)
+    - cron: '*/15 * * * *'
+  # 允許手動觸發 (方便測試)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Data from Hospital Authority
+        run: |
+          # 下載 JSON 檔案並儲存為 aed_data.json
+          # 使用 curl -L 跟隨重定向，-o 輸出檔案
+          curl -L "https://www.ha.org.hk/opendata/aed/aedwtdata2-tc.json" -o aed_data.json
+
+      - name: Commit and Push if changed
+        run: |
+          # 設定 Git 使用者 (GitHub Actions Bot)
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 檢查檔案是否有變動
+          if [[ -n $(git status -s aed_data.json) ]]; then
+            echo "Data has changed. Committing..."
+            git add aed_data.json
+            git commit -m "Update AED data: $(date -u)"
+            git push
+          else
+            echo "No changes in data. Skipping commit."
+          fi
